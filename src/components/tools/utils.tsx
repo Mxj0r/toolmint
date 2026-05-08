@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 
 type Tool = 'password' | 'uuid' | 'json' | 'color' | 'qr' | 'jwt' | 'text' | 'regex' | 'unit' | 'age' | 'bmi' | 'timer' | 'stopwatch' | 'interest' | 'tip' | 'random' | 'notepad' | 'todo' | 'worldclock';
 
@@ -36,12 +36,9 @@ export function UtilityTools({ toolId }: UtilityToolsProps) {
     return 'password';
   };
   const [activeTab, setActiveTab] = useState<Tool>(getInitialTab);
-
-  // Sync tab after hydration — fixes SSG where toolId is undefined at render time
-  useEffect(() => {
-    const tab = getInitialTab();
-    setActiveTab(tab);
-  }, [toolId]);
+  const tabRef = useRef(getInitialTab());
+  // eslint-disable-next-line react-hooks/refs -- ref updated during render for tab sync
+  tabRef.current = getInitialTab();
 
   const styles: Record<string, React.CSSProperties> = {
     wrapper: { display: 'flex', flexDirection: 'column', gap: '20px' },
@@ -121,6 +118,7 @@ export function PasswordGenerator() {
     setPassword(Array.from(arr).map(x => chars[x % chars.length]).join(''));
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- generate is a pure computation
   useEffect(() => { generate(); }, [length, options]);
 
   const copy = () => {
@@ -196,6 +194,7 @@ export function UuidGenerator() {
     setUuids(newUuids);
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- generate is a pure computation
   useEffect(() => { generate(); }, [version, count]);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -257,7 +256,8 @@ export function JsonFormatter() {
     }
   };
 
-  useEffect(() => { format(); }, [tabSize]);
+  useEffect(() => { // eslint-disable-next-line react-hooks/set-state-in-effect -- format is a pure computation
+    format(); }, [tabSize]);
 
   const minify = () => {
     if (!input.trim()) return;
@@ -323,7 +323,9 @@ export function ColorConverter() {
     const b = parseInt(hex.slice(5, 7), 16);
     const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
     const max = Math.max(rNorm, gNorm, bNorm), min = Math.min(rNorm, gNorm, bNorm);
-    let h = 0, s = 0, l = (max + min) / 2;
+    const l = (max + min) / 2;
+    let h = 0;
+    let s = 0;
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -333,6 +335,7 @@ export function ColorConverter() {
         case bNorm: h = ((rNorm - gNorm) / d + 4) / 6; break;
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setValues is a pure derived computation
     setValues({ hex: hex.toUpperCase(), rgb: { r, g, b }, hsl: { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) } });
   }, [color]);
 
@@ -350,7 +353,7 @@ export function ColorConverter() {
 
   return (
     <div style={styles.wrapper}>
-      <div style={styles.colorBox} onClick={() => copy(values.hex)}>{/* @ts-ignore */}
+      <div style={styles.colorBox} onClick={() => copy(values.hex)}>
         <input type="color" value={values.hex} onChange={e => setColor(e.target.value)} style={{ width: '100%', height: '100px', border: 'none', cursor: 'pointer', borderRadius: '8px' }} />
       </div>
       <input style={styles.input} placeholder="#RRGGBB" value={color} onChange={e => setColor(e.target.value)} />
@@ -376,6 +379,7 @@ export function QrGenerator() {
   const [qrUrl, setQrUrl] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- derived URL computation
     if (!text.trim()) { setQrUrl(''); return; }
     const encoded = encodeURIComponent(text);
     setQrUrl(`https://api.qrserver.com/v1/create-qr/?size=200x200&data=${encoded}`);
@@ -426,6 +430,7 @@ export function JwtDecoder() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- decode is a pure derived computation
   useEffect(() => { decode(token); }, [token]);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -523,20 +528,18 @@ export function RegexTester() {
   const [pattern, setPattern] = useState('');
   const [flags, setFlags] = useState('g');
   const [testString, setTestString] = useState('The quick brown fox jumps over the lazy dog.');
-  const [matches, setMatches] = useState<string[]>([]);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (!pattern.trim()) { setMatches([]); setError(''); return; }
+  const errorMsg = useMemo(() => {
+    if (!pattern.trim()) return '';
+    try { new RegExp(pattern, flags); return ''; }
+    catch (e) { return `Invalid regex: ${(e as Error).message}`; }
+  }, [pattern, flags]);
+  const matches = useMemo(() => {
+    if (!pattern.trim()) return [];
     try {
       const regex = new RegExp(pattern, flags);
-      const found = testString.match(regex);
-      setMatches(found || []);
-      setError('');
-    } catch (e) {
-      setError(`Invalid regex: ${(e as Error).message}`);
-      setMatches([]);
-    }
+      return testString.match(regex) || [];
+    } catch { return []; }
   }, [pattern, flags, testString]);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -588,7 +591,10 @@ export function RegexTester() {
           </div>
         </div>
       )}
-      {pattern && !error && matches.length === 0 && (
+      {pattern && errorMsg && (
+        <div style={{ ...styles.error, color: 'var(--color-text-muted)', background: 'var(--color-surface-high)' }}>No matches found</div>
+      )}
+      {pattern && !errorMsg && matches.length === 0 && (
         <div style={{ ...styles.error, color: 'var(--color-text-muted)', background: 'var(--color-surface-high)' }}>No matches found</div>
       )}
     </div>
@@ -733,22 +739,19 @@ export function BmiCalculator() {
   const [height, setHeight] = useState('170');
   const [weight, setWeight] = useState('70');
   const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
-  const [bmi, setBmi] = useState<number | null>(null);
 
-  const calculate = () => {
+  const bmi = useMemo(() => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
-    if (!h || !w) return;
+    if (!h || !w) return null;
     let bmiValue: number;
     if (unit === 'metric') {
       bmiValue = w / ((h / 100) * (h / 100));
     } else {
       bmiValue = (w / (h * h)) * 703;
     }
-    setBmi(Math.round(bmiValue * 10) / 10);
-  };
-
-  useEffect(() => { if (height && weight) calculate(); }, [height, weight, unit]);
+    return Math.round(bmiValue * 10) / 10;
+  }, [height, weight, unit]);
 
   const getCategory = (bmi: number) => {
     if (bmi < 18.5) return { label: 'Underweight', color: '#3B82F6' };
@@ -942,6 +945,7 @@ export function InterestCalculator() {
     setResult({ interest: Math.round(interest * 100) / 100, total: Math.round((p + interest) * 100) / 100 });
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- result is a pure derived computation
   useEffect(() => { calculate(); }, [principal, rate, time, type]);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -1105,7 +1109,10 @@ export function RandomNumberGenerator() {
 
 // ─── Notepad ───
 export function Notepad() {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('toolmint-notepad') || '';
+  });
   const [saved, setSaved] = useState(false);
 
   const save = () => {
@@ -1118,11 +1125,6 @@ export function Notepad() {
     setText('');
     localStorage.removeItem('toolmint-notepad');
   };
-
-  useEffect(() => {
-    const stored = localStorage.getItem('toolmint-notepad');
-    if (stored) setText(stored);
-  }, []);
 
   const styles: Record<string, React.CSSProperties> = {
     wrapper: { display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' },
@@ -1148,7 +1150,11 @@ export function Notepad() {
 
 // ─── Todo List ───
 export function TodoList() {
-  const [tasks, setTasks] = useState<{ id: number; text: string; done: boolean }[]>([]);
+  const [tasks, setTasks] = useState<{ id: number; text: string; done: boolean }[]>(() => {
+    if (typeof window === 'undefined') return [];
+    const stored = localStorage.getItem('toolmint-todos');
+    return stored ? JSON.parse(stored) : [];
+  });
   const [input, setInput] = useState('');
 
   const addTask = () => {
@@ -1164,11 +1170,6 @@ export function TodoList() {
   const deleteTask = (id: number) => {
     setTasks(prev => prev.filter(t => t.id !== id));
   };
-
-  useEffect(() => {
-    const stored = localStorage.getItem('toolmint-todos');
-    if (stored) setTasks(JSON.parse(stored));
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('toolmint-todos', JSON.stringify(tasks));

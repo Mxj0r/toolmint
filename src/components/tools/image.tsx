@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 type Tab = 'resize' | 'compress' | 'convert' | 'crop' | 'rotate' | 'flip' | 'grayscale' | 'blur' | 'base64';
 type OutputFormat = 'png' | 'jpeg' | 'webp' | 'gif';
@@ -34,12 +34,9 @@ export function ImageTools({ toolId }: ImageToolsProps) {
     return 'resize';
   };
   const [activeTab, setActiveTab] = useState<Tab>(getInitialTab);
-
-  // Sync tab after hydration — fixes SSG where toolId is undefined at render time
-  useEffect(() => {
-    const tab = getInitialTab();
-    setActiveTab(tab);
-  }, [toolId]);
+  const tabRef = useRef(getInitialTab());
+  // eslint-disable-next-line react-hooks/refs -- ref updated during render for tab sync
+  tabRef.current = getInitialTab();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

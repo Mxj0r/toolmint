@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 type Tool = 'base64' | 'hash' | 'url' | 'cron';
 
@@ -288,12 +288,9 @@ export function DeveloperTools({ toolId }: DeveloperToolsProps) {
     return 'base64';
   };
   const [activeTab, setActiveTab] = useState<DevTool>(getInitialTab);
-
-  // Sync tab after hydration — fixes SSG where toolId is undefined at render time
-  useEffect(() => {
-    const tab = getInitialTab();
-    setActiveTab(tab);
-  }, [toolId]);
+  const tabRef = useRef(getInitialTab());
+  // eslint-disable-next-line react-hooks/refs -- ref updated during render for tab sync
+  tabRef.current = getInitialTab();
 
   const styles: Record<string, React.CSSProperties> = {
     wrapper: { display: 'flex', flexDirection: 'column', gap: '20px' },

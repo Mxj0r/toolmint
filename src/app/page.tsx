@@ -160,7 +160,7 @@ export default function HomePage() {
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--color-text-muted)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔍</div>
-              <p style={{ fontSize: '1.1rem' }}>No tools found for "<strong style={{ color: 'var(--color-text)' }}>{search}</strong>"</p>
+              <p style={{ fontSize: '1.1rem' }}>No tools found for <strong style={{ color: 'var(--color-text)' }}>&quot;{search}&quot;</strong></p>
               <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>Try a different search term or browse all categories.</p>
             </div>
           )}

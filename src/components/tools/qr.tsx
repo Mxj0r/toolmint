@@ -4,16 +4,10 @@ import { useState, useEffect } from 'react';
 export function QrGenerator() {
   const [text, setText] = useState('https://example.com');
   const [size, setSize] = useState(300);
-  const [qrUrl, setQrUrl] = useState('');
 
-  useEffect(() => {
-    if (!text.trim()) {
-      setQrUrl('');
-      return;
-    }
-    const encoded = encodeURIComponent(text);
-    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}`);
-  }, [text, size]);
+  const qrUrl = text.trim()
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`
+    : '';
 
   const downloadQr = () => {
     if (!qrUrl) return;

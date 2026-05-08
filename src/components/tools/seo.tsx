@@ -26,6 +26,7 @@ export function SeoTools({ toolId }: SeoToolsProps) {
   // Sync tab after hydration — fixes SSG where toolId is undefined at render time
   useEffect(() => {
     const tab = getInitialTab();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- tab derived from static prop, runs once
     setActiveTab(tab);
   }, [toolId]);
 

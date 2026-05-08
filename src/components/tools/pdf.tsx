@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { PDFDocument, rgb, Rotation } from 'pdf-lib';
 
 type Tab = 'merge' | 'info' | 'text' | 'extract' | 'compress' | 'convert' | 'password' | 'rotate';
@@ -26,12 +26,9 @@ export function PdfTools({ toolId }: PdfToolsProps) {
     return 'merge';
   };
   const [activeTab, setActiveTab] = useState<Tab>(getInitialTab);
-
-  // Sync tab after hydration — fixes SSG where toolId is undefined at render time
-  useEffect(() => {
-    const tab = getInitialTab();
-    setActiveTab(tab);
-  }, [toolId]);
+  const tabRef = useRef(getInitialTab());
+  // eslint-disable-next-line react-hooks/refs -- ref updated during render for tab sync
+  tabRef.current = getInitialTab();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

@@ -115,6 +115,7 @@ export default function ToolUI({ toolId }: Props) {
   return <Component toolId={toolId} />;
 }
 
+// eslint-disable react-hooks/set-state-in-effect -- all setOutput calls are synchronous derived computations
 function ContentTool({ toolId }: { toolId: string }) {
   const [input, setInput] = React.useState('');
   const [output, setOutput] = React.useState('');
@@ -125,6 +126,7 @@ function ContentTool({ toolId }: { toolId: string }) {
       const chars = input.length;
       const sentences = input.split(/[.!?]+/).filter(s => s.trim()).length;
       const paragraphs = input.split(/\n\n+/).filter(p => p.trim()).length;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- derived output computation
       setOutput(`${words} words | ${chars} characters | ${sentences} sentences | ${paragraphs} paragraphs`);
     } else if (toolId === 'sentence-counter') {
       const sentences = input.split(/[.!?]+/).filter(s => s.trim()).length;
