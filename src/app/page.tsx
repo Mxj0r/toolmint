@@ -6,6 +6,7 @@ import { TOOLS, CATEGORIES } from '@/lib/tools';
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [activeCat, setActiveCat] = useState('all');
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   const filtered = TOOLS.filter(t => {
     const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -28,6 +29,7 @@ export default function HomePage() {
               <ul className="header-nav">
                 <li><Link href="/#tools">Tools</Link></li>
                 <li><Link href="/#categories">Categories</Link></li>
+                <li><Link href="/blog">Blog</Link></li>
               </ul>
             </nav>
             <Link href="/#tools" className="header-cta">All Tools</Link>
@@ -179,6 +181,87 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <section className="section" id="faq">
+        <div className="container" style={{ maxWidth: '780px' }}>
+          <h2 className="section-title">Frequently Asked Questions</h2>
+          <p className="section-sub">Everything you need to know about ToolMint.</p>
+          <div style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              {
+                q: 'Do I need to sign up or create an account?',
+                a: 'No. Every tool on ToolMint works instantly in your browser. No signup, no email, no watermark — just open and use.',
+              },
+              {
+                q: 'Are these tools really free?',
+                a: 'Yes, 100% free. We built ToolMint to be the tool we wished existed — clean, fast, and genuinely free forever. No hidden paywalls.',
+              },
+              {
+                q: 'Is my data safe? Are files uploaded to your servers?',
+                a: 'Most tools process everything locally in your browser. For PDF and image tools that need server-side processing, files are handled transiently and never stored permanently. We do not sell or share any data.',
+              },
+              {
+                q: 'Do tools work on mobile and tablet?',
+                a: 'Yes. ToolMint is fully responsive — every tool works on desktop, tablet, and mobile devices.',
+              },
+              {
+                q: 'How do I report a bug or request a new tool?',
+                a: 'Visit our contact page and send us a message. We read every submission and aim to respond within 48 hours.',
+              },
+              {
+                q: 'How often are new tools added?',
+                a: 'We add new tools regularly based on user requests. Follow our blog to stay updated on new releases and feature announcements.',
+              },
+            ].map((faq, i) => (
+              <div key={i} style={{
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+              }}>
+                <button
+                  onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '20px 24px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text)',
+                    gap: '16px',
+                  }}
+                >
+                  {faq.q}
+                  <span style={{
+                    flexShrink: 0,
+                    fontSize: '1.2rem',
+                    color: 'var(--color-primary)',
+                    transform: faqOpen === i ? 'rotate(45deg)' : 'rotate(0deg)',
+                    transition: 'transform 200ms ease',
+                  }}>+</span>
+                </button>
+                {faqOpen === i && (
+                  <div style={{
+                    padding: '0 24px 20px',
+                    color: 'var(--color-text-muted)',
+                    lineHeight: 1.7,
+                    fontSize: '0.95rem',
+                  }}>
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── FOOTER ── */}
       <footer className="footer">
         <div className="container">
@@ -213,6 +296,7 @@ export default function HomePage() {
               <ul className="footer-links">
                 <li><Link href="/privacy">Privacy Policy</Link></li>
                 <li><Link href="/terms">Terms of Use</Link></li>
+                <li><Link href="/blog">Blog</Link></li>
               </ul>
             </div>
           </div>
