@@ -100,9 +100,8 @@ export default function HomePage() {
         <div className="container">
           <div className="stats-inner">
             <div className="stat-item"><strong>100+</strong> Free Tools</div>
-            <div className="stat-item"><strong>50K+</strong> Monthly Users</div>
             <div className="stat-item"><strong>100%</strong> Free Forever</div>
-            <div className="stat-item"><strong>Zero</strong> Signup Required</div>
+            <div className="stat-item"><strong>No</strong> Signup Required</div>
           </div>
         </div>
       </div>

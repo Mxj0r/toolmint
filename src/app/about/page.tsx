@@ -162,7 +162,6 @@ export default function AboutPage() {
           }}>
             {[
               { number: '100+', label: 'Free Tools' },
-              { number: '50K+', label: 'Monthly Users' },
               { number: '8', label: 'Categories' },
             ].map(stat => (
               <div key={stat.label} style={{
