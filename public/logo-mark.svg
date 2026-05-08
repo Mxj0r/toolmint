@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Leaf body -->
+  <path d="M32 6C32 6 14 18 14 36C14 46 22 54 32 58C42 54 50 46 50 36C50 18 32 6 32 6Z" fill="#00E5A0"/>
+  <!-- Leaf vein center -->
+  <path d="M32 12V52" stroke="#0C0F14" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+  <!-- Leaf vein left -->
+  <path d="M32 24C28 22 22 26 18 32" stroke="#0C0F14" stroke-width="1.2" stroke-linecap="round" opacity="0.2"/>
+  <!-- Leaf vein right -->
+  <path d="M32 24C36 22 42 26 46 32" stroke="#0C0F14" stroke-width="1.2" stroke-linecap="round" opacity="0.2"/>
+  <!-- Leaf vein lower left -->
+  <path d="M32 38C27 37 22 40 18 46" stroke="#0C0F14" stroke-width="1" stroke-linecap="round" opacity="0.15"/>
+  <!-- Leaf vein lower right -->
+  <path d="M32 38C37 37 42 40 46 46" stroke="#0C0F14" stroke-width="1" stroke-linecap="round" opacity="0.15"/>
+  <!-- Stem -->
+  <path d="M32 58L32 62" stroke="#00E5A0" stroke-width="2" stroke-linecap="round"/>
+</svg>
