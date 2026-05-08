@@ -38,12 +38,21 @@ export default function ToolUI({ toolId }: Props) {
     'uuid-generator': UtilityTools,
     'lorem-ipsum': UtilityTools,
     'unit-converter': UtilityTools,
-    'color-converter': UtilityTools,
+    'color-picker': UtilityTools,
+    'age-calculator': UtilityTools,
+    'bmi-calculator': UtilityTools,
     'countdown-timer': UtilityTools,
     'stopwatch': UtilityTools,
+    'interest-calculator': UtilityTools,
+    'tip-calculator': UtilityTools,
+    'random-number': UtilityTools,
+    'notepad': UtilityTools,
+    'todo-list': UtilityTools,
+    'world-clock': UtilityTools,
     'text-analyzer': UtilityTools,
     // QR
     'qr-generator': QrGenerator,
+    'qr-reader': QrGenerator,
     'vcard-generator': QrGenerator,
     'wifi-qr-generator': QrGenerator,
     // AI
@@ -62,17 +71,29 @@ export default function ToolUI({ toolId }: Props) {
     'image-rotator': ImageTools,
     'image-flip': ImageTools,
     'image-grayscale': ImageTools,
+    'image-blur': ImageTools,
+    'image-to-base64': ImageTools,
+    'gif-resizer': ImageTools,
+    'jpg-png-converter': ImageTools,
     // PDF
     'pdf-merge': PdfTools,
-    'pdf-info': PdfTools,
-    'pdf-text': PdfTools,
+    'pdf-split': PdfTools,
+    'pdf-compress': PdfTools,
+    'pdf-to-jpg': PdfTools,
+    'jpg-to-pdf': PdfTools,
     'pdf-to-text': PdfTools,
+    'pdf-text': PdfTools,
+    'pdf-password': PdfTools,
+    'pdf-rotate': PdfTools,
+    'pdf-info': PdfTools,
     'pdf-pages': PdfTools,
   };
 
-  const contentTools = ['word-counter', 'sentence-counter', 'paragraph-counter', 'readability-checker',
+  const contentTools = [
+    'word-counter', 'sentence-counter', 'paragraph-counter', 'readability-checker',
     'article-rewriter', 'paragraph-generator', 'content-ideas', 'hashtag-generator',
-    'instagram-caption', 'bio-writer', 'sentence-rewriter', 'paragraph-rewriter'];
+    'instagram-caption', 'bio-writer', 'sentence-rewriter', 'paragraph-rewriter',
+  ];
 
   if (contentTools.includes(toolId)) {
     return <ContentTool toolId={toolId} />;
@@ -134,8 +155,18 @@ function ContentTool({ toolId }: { toolId: string }) {
   const styles: Record<string, React.CSSProperties> = {
     wrapper: { display: 'flex', flexDirection: 'column', gap: '16px' },
     label: { fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '4px' },
-    textarea: { width: '100%', minHeight: '120px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '12px 16px', color: 'var(--color-text)', fontSize: '0.95rem', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-body)' },
-    output: { minHeight: '60px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '12px 16px', color: 'var(--color-primary)', fontSize: '0.95rem', whiteSpace: 'pre-wrap' },
+    textarea: {
+      width: '100%', minHeight: '120px', background: 'var(--color-bg)',
+      border: '1px solid var(--color-border)', borderRadius: '8px',
+      padding: '12px 16px', color: 'var(--color-text)', fontSize: '0.95rem',
+      outline: 'none', resize: 'vertical', fontFamily: 'var(--font-body)',
+    },
+    output: {
+      minHeight: '60px', background: 'var(--color-surface)',
+      border: '1px solid var(--color-border)', borderRadius: '8px',
+      padding: '12px 16px', color: 'var(--color-primary)', fontSize: '0.95rem',
+      whiteSpace: 'pre-wrap',
+    },
   };
 
   return (

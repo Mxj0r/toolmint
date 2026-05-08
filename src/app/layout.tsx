@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import CookieConsent from "@/components/CookieConsent";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -70,8 +72,16 @@ export default function RootLayout({
         <link rel="icon" href="/logo-mark.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://unpkg.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <Script
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
+          crossOrigin="anonymous"
+        />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

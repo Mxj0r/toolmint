@@ -20,8 +20,8 @@ export default function TermsPage() {
               <ul className="header-nav">
                 <li><Link href="/">Home</Link></li>
                 <li><Link href="/#tools">Tools</Link></li>
-                <li><Link href="/privacy">Privacy</Link></li>
-                <li><Link href="/terms">Terms</Link></li>
+                <li><Link href="/about">About</Link></li>
+                <li><Link href="/contact">Contact</Link></li>
               </ul>
             </nav>
             <Link href="/" className="header-cta">All Tools</Link>
@@ -32,6 +32,25 @@ export default function TermsPage() {
       <main style={{ padding: 'var(--space-16) 0' }}>
         <div className="container" style={{ maxWidth: '760px' }}>
           <div style={{ marginBottom: 'var(--space-10)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
+              <Link
+                href="/"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'var(--color-text-muted)',
+                  fontSize: '0.875rem',
+                  textDecoration: 'none',
+                  transition: 'color var(--transition-fast)',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Tools
+              </Link>
+            </div>
             <h1 style={{
               fontSize: '2.5rem',
               fontWeight: 800,
@@ -70,7 +89,7 @@ export default function TermsPage() {
                 2. Description of Service
               </h2>
               <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7 }}>
-                ToolMint provides free online tools for SEO, PDF processing, image manipulation, AI content generation, QR codes, developer utilities, and general-purpose calculators. All tools are provided for informational and utility purposes. We reserve the right to modify, suspend, or discontinue any tool at any time without notice.
+                ToolMint provides free online tools for SEO processing, PDF manipulation, image editing, AI content generation, QR code creation, developer utilities, and general-purpose calculators. All tools are provided for informational and utility purposes. We reserve the right to modify, suspend, or discontinue any tool at any time without notice.
               </p>
             </section>
 

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 
-type Tab = 'resize' | 'compress' | 'convert' | 'crop' | 'rotate' | 'flip' | 'grayscale';
+type Tab = 'resize' | 'compress' | 'convert' | 'crop' | 'rotate' | 'flip' | 'grayscale' | 'blur' | 'base64';
 type OutputFormat = 'png' | 'jpeg' | 'webp' | 'gif';
 
 interface ImageInfo {
@@ -21,6 +21,9 @@ const IMAGE_TOOL_TAB_MAP: Record<string, Tab> = {
   'image-rotator': 'rotate',
   'image-flip': 'flip',
   'image-grayscale': 'grayscale',
+  'image-blur': 'blur',
+  'image-to-base64': 'base64',
+  'gif-resizer': 'resize',
 };
 
 interface ImageToolsProps { toolId?: string }
@@ -74,6 +77,8 @@ export function ImageTools({ toolId }: ImageToolsProps) {
     { id: 'rotate', label: 'Rotate' },
     { id: 'flip', label: 'Flip' },
     { id: 'grayscale', label: 'Grayscale' },
+    { id: 'blur', label: 'Blur' },
+    { id: 'base64', label: 'Base64' },
   ];
 
   const styles: Record<string, React.CSSProperties> = {
@@ -532,6 +537,53 @@ export function ImageTools({ toolId }: ImageToolsProps) {
     }
   };
 
+  const [blurRadius, setBlurRadius] = useState(10);
+
+  const handleBlur = async () => {
+    if (!selectedFile) return;
+    setLoading(true);
+    setError('');
+    try {
+      const result = await createCanvasFromFile();
+      if (!result) throw new Error('Failed to create canvas');
+      const { canvas: c } = result;
+
+      const canvasEl = document.createElement('canvas');
+      canvasEl.width = c.width;
+      canvasEl.height = c.height;
+      const ctx = canvasEl.getContext('2d')!;
+
+      ctx.filter = `blur(${blurRadius}px)`;
+      ctx.drawImage(c, 0, 0);
+      ctx.filter = 'none';
+      processAndSetResult(canvasEl);
+    } catch (err) {
+      setError('Failed to apply blur');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [base64Output, setBase64Output] = useState('');
+
+  const handleBase64 = async () => {
+    if (!selectedFile) return;
+    setLoading(true);
+    setError('');
+    try {
+      const buffer = await selectedFile.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const ext = selectedFile.name.split('.').pop() || 'png';
+      const mime = `image/${ext}`;
+      setBase64Output(`data:${mime};base64,${base64}`);
+      setResultUrl(`data:${mime};base64,${base64}`);
+    } catch (err) {
+      setError('Failed to encode image');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const processAndSetResult = (canvasEl: HTMLCanvasElement) => {
     const mimeType = `image/${outputFormat}`;
     const quality = outputFormat === 'png' ? undefined : compressQuality / 100;
@@ -947,6 +999,50 @@ export function ImageTools({ toolId }: ImageToolsProps) {
               <button style={styles.btn} onClick={handleGrayscale}>
                 Apply Grayscale
               </button>
+            </div>
+          )}
+
+          {activeTab === 'blur' && selectedFile && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '8px', display: 'block' }}>
+                  Blur Radius: {blurRadius}px
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="50"
+                  value={blurRadius}
+                  onChange={e => setBlurRadius(parseInt(e.target.value))}
+                  style={styles.slider}
+                />
+              </div>
+              <button style={styles.btn} onClick={handleBlur}>
+                Apply Blur
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'base64' && selectedFile && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <p style={{ fontSize: '0.875rem', color: 'var(--color-text)', textAlign: 'center' as const }}>
+                Encode your image as a Base64 string for embedding in HTML/CSS
+              </p>
+              <button style={styles.btn} onClick={handleBase64}>
+                Generate Base64
+              </button>
+              {base64Output && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+                    <button style={styles.copyBtn} onClick={() => navigator.clipboard.writeText(base64Output)}>Copy</button>
+                  </div>
+                  <textarea
+                    readOnly
+                    value={base64Output}
+                    style={{ ...styles.textarea, fontFamily: 'var(--font-mono)', fontSize: '0.75rem', minHeight: '80px' }}
+                  />
+                </div>
+              )}
             </div>
           )}
 

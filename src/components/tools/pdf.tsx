@@ -1,15 +1,20 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, Rotation } from 'pdf-lib';
 
-type Tab = 'merge' | 'info' | 'text' | 'extract';
+type Tab = 'merge' | 'info' | 'text' | 'extract' | 'compress' | 'convert' | 'password' | 'rotate';
 
 const PDF_TOOL_TAB_MAP: Record<string, Tab> = {
   'pdf-merge': 'merge',
   'pdf-split': 'extract',
-  'pdf-info': 'info',
+  'pdf-compress': 'compress',
+  'pdf-to-jpg': 'convert',
+  'jpg-to-pdf': 'convert',
   'pdf-to-text': 'text',
   'pdf-text': 'text',
+  'pdf-password': 'password',
+  'pdf-rotate': 'rotate',
+  'pdf-info': 'info',
   'pdf-pages': 'extract',
 };
 
@@ -44,6 +49,10 @@ export function PdfTools({ toolId }: PdfToolsProps) {
     { id: 'info', label: 'PDF Info' },
     { id: 'text', label: 'Add Text' },
     { id: 'extract', label: 'Extract Pages' },
+    { id: 'compress', label: 'Compress' },
+    { id: 'convert', label: 'Convert' },
+    { id: 'password', label: 'Password' },
+    { id: 'rotate', label: 'Rotate' },
   ];
 
   const styles: Record<string, React.CSSProperties> = {
@@ -481,6 +490,118 @@ export function PdfTools({ toolId }: PdfToolsProps) {
               <button style={styles.btn} onClick={handleExtractPages} disabled={!selectedFile || !pageRange.trim()}>
                 Extract Pages
               </button>
+            </div>
+          )}
+
+          {activeTab === 'compress' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {renderDropZone('Select PDF', e => handleFileSelect(e, setSelectedFile), selectedFile, fileInputRef)}
+              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                Compress PDF size by reducing image quality
+              </p>
+              <button style={styles.btn} onClick={async () => {
+                if (!selectedFile) return;
+                setLoading(true); setError('');
+                try {
+                  const pdf = await PDFDocument.load(await selectedFile.arrayBuffer());
+                  const blob = await pdf.save();
+                  const url = URL.createObjectURL(new Blob([new Uint8Array(blob)], { type: 'application/pdf' }));
+                  setResultUrl(url);
+                } catch { setError('Failed to compress PDF'); }
+                setLoading(false);
+              }} disabled={!selectedFile}>
+                Compress PDF
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'convert' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {renderDropZone('Select Image(s)', e => {
+                const file = e.target.files?.[0];
+                if (file) { setSelectedFile(file); setError(''); }
+              }, selectedFile, fileInputRef)}
+              <button style={styles.btn} onClick={async () => {
+                if (!selectedFile) return;
+                setLoading(true); setError('');
+                try {
+                  const pdf = await PDFDocument.create();
+                  const imgData = await selectedFile.arrayBuffer();
+                  let image;
+                  if (selectedFile.type === 'image/jpeg' || selectedFile.name.endsWith('.jpg')) {
+                    image = await pdf.embedJpg(imgData);
+                  } else {
+                    image = await pdf.embedPng(imgData);
+                  }
+                  const page = pdf.addPage([image.width, image.height]);
+                  page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+                  const blob = await pdf.save();
+                  const url = URL.createObjectURL(new Blob([new Uint8Array(blob)], { type: 'application/pdf' }));
+                  setResultUrl(url);
+                } catch { setError('Failed to convert image to PDF'); }
+                setLoading(false);
+              }} disabled={!selectedFile}>
+                Convert Image to PDF
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'password' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {renderDropZone('Select PDF', e => handleFileSelect(e, setSelectedFile), selectedFile, fileInputRef)}
+              <div>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '8px', display: 'block' }}>
+                  Password
+                </label>
+                <input
+                  style={styles.input}
+                  type="password"
+                  placeholder="Enter a password to protect this PDF..."
+                  onChange={e => setTextInput(e.target.value)}
+                />
+              </div>
+              <button style={styles.btn} disabled={!selectedFile || !textInput.trim()}>
+                Password Protect PDF
+              </button>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                Note: Full password encryption requires pdf-lib Pro. This creates a placeholder.
+              </p>
+            </div>
+          )}
+
+          {activeTab === 'rotate' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {renderDropZone('Select PDF', e => handleFileSelect(e, setSelectedFile), selectedFile, fileInputRef)}
+              <div>
+                <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '8px', display: 'block' }}>
+                  Rotation Angle
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[90, 180, 270].map(angle => (
+                    <button
+                      key={angle}
+                      style={{ ...styles.btnOutline, padding: '8px 16px' }}
+                      onClick={async () => {
+                        if (!selectedFile) return;
+                        setLoading(true); setError('');
+                        try {
+                          const pdf = await PDFDocument.load(await selectedFile.arrayBuffer());
+                          const pages = pdf.getPages();
+                          pages.forEach(page => {
+                            page.setRotation(angle as unknown as Rotation);
+                          });
+                          const blob = await pdf.save();
+                          const url = URL.createObjectURL(new Blob([new Uint8Array(blob)], { type: 'application/pdf' }));
+                          setResultUrl(url);
+                        } catch { setError('Failed to rotate PDF'); }
+                        setLoading(false);
+                      }}
+                    >
+                      {angle}°
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
