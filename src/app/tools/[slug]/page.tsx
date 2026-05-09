@@ -154,6 +154,30 @@ export default async function ToolPage({ params }: Props) {
             <div className="tool-main">
               <ToolUI toolId={tool.id} />
 
+              {/* Ad slot — horizontal display ad */}
+              <div style={{
+                margin: 'var(--space-6) 0',
+                padding: 'var(--space-4) var(--space-6)',
+                background: 'var(--color-surface-high)',
+                border: '1px dashed var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '90px',
+                color: 'var(--color-text-muted)',
+                fontSize: '0.8rem',
+                gap: 'var(--space-3)',
+                flexWrap: 'wrap',
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="9" y1="21" x2="9" y2="9"/>
+                </svg>
+                <span>Your ad here — 728×90 Leaderboard</span>
+              </div>
+
               {/* SEO Description */}
               {SEO_DESCRIPTIONS[tool.id] && (
                 <div style={{ marginTop: 'var(--space-8)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-border)' }}>
