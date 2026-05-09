@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { TOOLS, getToolById, getToolsByCat, CATEGORY_META } from '@/lib/tools';
+import { SEO_DESCRIPTIONS } from '@/lib/seo-descriptions';
 import ToolUI from '@/components/tools/ToolUI';
 
 interface Props {
@@ -152,6 +153,37 @@ export default async function ToolPage({ params }: Props) {
             {/* Main content area */}
             <div className="tool-main">
               <ToolUI toolId={tool.id} />
+
+              {/* SEO Description */}
+              {SEO_DESCRIPTIONS[tool.id] && (
+                <div style={{ marginTop: 'var(--space-8)', paddingTop: 'var(--space-6)', borderTop: '1px solid var(--color-border)' }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--color-text)' }}>
+                    About the {tool.name}
+                  </h2>
+                  <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '0.95rem', marginBottom: 'var(--space-4)' }}>
+                    {SEO_DESCRIPTIONS[tool.id].intro}
+                  </p>
+                  <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '0.95rem', marginBottom: 'var(--space-4)' }}>
+                    {SEO_DESCRIPTIONS[tool.id].body}
+                  </p>
+                  {SEO_DESCRIPTIONS[tool.id].example && (
+                    <div style={{
+                      background: 'var(--color-surface-high)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-lg)',
+                      padding: 'var(--space-4)',
+                      marginTop: 'var(--space-4)',
+                    }}>
+                      <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>
+                        Example
+                      </p>
+                      <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, fontSize: '0.9rem', fontStyle: 'italic' }}>
+                        {SEO_DESCRIPTIONS[tool.id].example}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
