@@ -93,6 +93,7 @@ export default function ToolUI({ toolId }: Props) {
     'word-counter', 'sentence-counter', 'paragraph-counter', 'readability-checker',
     'article-rewriter', 'paragraph-generator', 'content-ideas', 'hashtag-generator',
     'instagram-caption', 'bio-writer', 'sentence-rewriter', 'paragraph-rewriter',
+    'seo-evaluator', 'plagiarism-checker',
   ];
 
   if (contentTools.includes(toolId)) {
@@ -149,8 +150,41 @@ function ContentTool({ toolId }: { toolId: string }) {
       setOutput(input ? `[Rewritten content would appear here for: ${input.slice(0, 50)}...]` : 'Enter text to rewrite.');
     } else if (toolId === 'paragraph-generator' || toolId === 'content-ideas') {
       setOutput(input ? `Content ideas based on: "${input}"` : 'Enter a topic to generate content ideas.');
-    } else if (toolId === 'instagram-caption') {
+} else if (toolId === 'instagram-caption') {
       setOutput(input ? `#InstagramCaption #Content #Creative ${input.slice(0, 50)}...` : 'Enter a topic for your caption.');
+    } else if (toolId === 'seo-evaluator') {
+      const chars = input.length;
+      const words = input.trim() ? input.trim().split(/\s+/).length : 0;
+      const score = Math.min(100, Math.round(
+        (chars > 50 ? 20 : 0) +
+        (words > 300 ? 20 : 0) +
+        (input.includes('https') ? 10 : 0) +
+        ((input.match(/#[a-z]+/g) || []).length > 0 ? 10 : 0) +
+        (words > 0 ? 40 : 0)
+      ));
+      const hashtags = (input.match(/#[a-z]+/g) || []).length;
+      const links = (input.match(/https/g) || []).length;
+      setOutput(
+        'SEO Score: ' + score + '/100\n\nFactors:\n' +
+        '- Content length: ' + words + ' words ' + (words > 300 ? '✓' : '✗ (aim for 300+)') + '\n' +
+        '- Meta description area: ' + chars + ' chars ' + (chars > 120 ? '✓' : '✗ (aim for 150-160)') + '\n' +
+        '- External links: ' + links + ' ' + (links > 0 ? '✓' : '✗ (add 2-3)') + '\n' +
+        '- Hashtags: ' + hashtags + ' ' + (hashtags > 0 ? '✓' : '✗ (add 2-3)')
+      );
+    } else if (toolId === 'plagiarism-checker') {
+      if (!input.trim()) {
+        setOutput('Enter text to check for plagiarism.');
+      } else {
+        const words = input.trim().split(/\s+/).length;
+        const uniqueWords = [...new Set(input.toLowerCase().match(/\b[a-z]{4,}\b/g) || [])].length;
+        const duplicationRatio = words > 0 ? ((1 - uniqueWords / words) * 100).toFixed(1) : '0.0';
+        setOutput(
+          'Plagiarism scan complete for ' + words + ' words.\n\n' +
+          'Unique content ratio: ' + (100 - parseFloat(duplicationRatio)).toFixed(1) + '%\n' +
+          'Potential duplicate phrases: ' + Math.round(parseFloat(duplicationRatio)) + ' sections\n\n' +
+          'Note: This is a basic local check. For full web plagiarism detection, integrate a professional API.'
+        );
+      }
     }
   }, [input, toolId]);
 
