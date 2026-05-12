@@ -4,6 +4,7 @@ import { TOOLS } from '@/lib/tools';
 const BASE_URL = 'https://toolmint.io';
 
 const BLOG_POSTS = [
+  'technical-seo-audit-free-tools',
   'how-to-compress-pdf-without-losing-quality',
   'seo-keyword-research-guide',
   'compress-images-for-web',

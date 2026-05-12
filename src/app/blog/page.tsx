@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    slug: 'technical-seo-audit-free-tools',
+    title: 'How to Do a Technical SEO Audit Using Only Free Tools',
+    excerpt: 'Run a complete technical SEO audit without spending a cent. Step-by-step guide using Google Search Console, PageSpeed Insights, and other free tools.',
+    category: 'SEO',
+    readTime: '7 min read',
+    date: 'May 11, 2026',
+  },
+  {
     slug: 'how-to-compress-pdf-without-losing-quality',
     title: 'How to Compress a PDF Without Losing Quality',
     excerpt: 'File too big to send? Learn the best way to reduce PDF size while keeping your documents crisp and professional — for free.',
